@@ -1,3 +1,5 @@
+package game.gui;
+
 import javax.swing.*;
 import java.awt.*;
 

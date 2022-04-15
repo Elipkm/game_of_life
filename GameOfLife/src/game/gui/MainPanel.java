@@ -1,34 +1,59 @@
+package game.gui;
+
 import game.Time;
-import game.World;
+import game.pojo.World;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 
 public class MainPanel extends JPanel {
 
-    private World world = new World();
-    private Time time = new Time(world);
-
-    // TODO: add automatic time simulation for the game, zoom further out and in with mouse
+    private final World world = new World();
+    private final WorldDraw worldDraw = new WorldDraw(world);
+    private final Time time = new Time(world);
 
     public MainPanel() {
         JButton btn = new JButton("start/stop create");
         JTextField creationTimeInterval = new JTextField("Time Interval");
         JButton automationBtn = new JButton("play game");
+
         JButton simulateBtn = new JButton("simulate game");
+
+        int simulateTimeUnit = 300;
+        Timer timer = new Timer(simulateTimeUnit, e -> {
+            world.ensureLawsOnWorldChange();
+            this.repaint();
+        });
+
+        simulateBtn.addActionListener(e -> {
+            if(timer.isRunning()){
+                System.out.println("stop timer");
+                timer.stop();
+            } else {
+                System.out.println("start timer");
+                timer.start();
+            }
+        });
         JTextField simulationTimeUnitInput = new JTextField("simulation time unit");
-        JTextField cellSize = new JTextField("Cell Size");
+        simulationTimeUnitInput.addActionListener(e -> {
+           String input = simulationTimeUnitInput.getText();
+           int ms = Integer.parseInt(input);
+           timer.setDelay(ms);
+        });
+
+        JTextField cellSize = new JTextField("Zoom Factor");
         cellSize.addActionListener(e -> {
             String input = cellSize.getText();
             int size = Integer.parseInt(input);
-            world.setCellSize(size);
+            worldDraw.setZoomFactor(size);
             this.repaint();
         });
 
         btn.addActionListener(e -> time.toggleActiveState());
-        automationBtn.addActionListener(e -> world.ensureLawsOnWorldChange(this));
+        automationBtn.addActionListener(e -> {
+            world.ensureLawsOnWorldChange();
+            this.repaint();
+        });
         creationTimeInterval.addActionListener(e -> {
             String input = creationTimeInterval.getText();
             int ms = Integer.parseInt(input);
@@ -42,6 +67,8 @@ public class MainPanel extends JPanel {
         this.add(automationBtn);
         this.add(creationTimeInterval);
         this.add(cellSize);
+        this.add(simulateBtn);
+        this.add(simulationTimeUnitInput);
 
         time.startTime(this);
     }
@@ -49,7 +76,7 @@ public class MainPanel extends JPanel {
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        world.paintComponent(g);
+        worldDraw.paintComponent(g);
     }
 
 }

@@ -1,5 +1,7 @@
 package game;
 
+import game.pojo.Cell;
+
 public class Laws {
 
     public boolean aliveState(Cell current, Cell[] neighbours){
