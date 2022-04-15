@@ -8,6 +8,7 @@ public class MainFrame extends JFrame {
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         this.setSize(800,600);
         this.setContentPane(new MainPanel());
+        this.setLocationRelativeTo(null);
         this.setVisible(true);
     }
 

@@ -1,26 +1,48 @@
 package game;
 
 import javax.swing.*;
-import java.awt.*;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class Time {
 
     private final World world;
 
-    public Time(World world, JPanel g) {
+    private final AtomicBoolean activated = new AtomicBoolean(false);
+    private int timeUnit = 500; // in ms
+
+    public void setTimeUnit(int timeUnit) {
+        this.timeUnit = timeUnit;
+    }
+
+    public int getTimeUnit() {
+        return timeUnit;
+    }
+
+    public Time(World world) {
         this.world = world;
 
+    }
+
+    public void startTime(JPanel g){
         new Thread(() -> {
             while(true) {
-                try {
-                    Thread.sleep(500);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                while (activated.get()) {
+                    try {
+                        world.randAlive();
+                        g.repaint();
+                        Thread.sleep(timeUnit);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    } catch (NullPointerException en){
+                        en.printStackTrace();
+                    }
                 }
-                world.randAlive();
-                g.repaint();
             }
         }).start();
+    }
+
+    public void toggleActiveState(){
+        activated.set(!activated.get());
     }
 
 }
