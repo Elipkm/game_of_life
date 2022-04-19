@@ -1,17 +1,20 @@
 package game.pojo;
 
 import game.Laws;
+import game.utils.Utils;
 import java.util.*;
 import java.util.List;
 
 public class World {
 
-    private final int WIDTH = 500;
-    private final int HEIGHT = 400;
+    private final int WIDTH;
+    private final int HEIGHT;
 
     private Cell[][] cells;
 
-    public World() {
+    public World(int width, int height) {
+        this.WIDTH = width;
+        this.HEIGHT = height;
         this.initCells();
     }
 
@@ -28,11 +31,12 @@ public class World {
         }
     }
 
-    public void setOneCellRandomlyAlive(){
-        int i = new Random().nextInt(this.WIDTH);
-        int j = new Random().nextInt(this.HEIGHT);
+    public void setOneCellRandomlyAlive(int xStart, int xEnd, int yStart, int yEnd){
+        int i = Utils.getRandomNumberInRange(xStart, xEnd-1);
+        int j = Utils.getRandomNumberInRange(yStart, yEnd-1);
 
         this.cells[i][j].setAlive(true);
+        this.onChange();
     }
 
     public void ensureLawsOnWorldChange(){
@@ -58,6 +62,8 @@ public class World {
         for(Cell cell : setToAlive){
             cell.setAlive(true);
         }
+
+        this.onChange();
     }
 
     private List<Cell> getNeighbours(int i, int j){
@@ -90,6 +96,15 @@ public class World {
         return neighbours;
     }
 
+    public void setAllCellsDead(){
+        for(Cell[] cellRow : cells){
+            for(Cell cell : cellRow){
+                cell.setAlive(false);
+            }
+        }
+        this.onChange();
+    }
+
     public int getHeight() {
         return this.HEIGHT;
     }
@@ -97,4 +112,13 @@ public class World {
     public int getWidth() {
         return this.WIDTH;
     }
+
+    private Runnable onChange;
+    public void setOnChange(Runnable runnable){
+        onChange = runnable;
+    }
+    private void onChange(){
+        this.onChange.run();
+    }
+
 }

@@ -1,8 +1,8 @@
 package game.gui;
 
 import game.pojo.Cell;
+import game.pojo.ViewPort;
 import game.pojo.World;
-
 import javax.swing.*;
 import java.awt.*;
 
@@ -12,16 +12,21 @@ public class WorldDraw extends JComponent {
     private final World world;
 
     // GUI related data for drawing
-    private final int worldStartX = 80;
-    private final int worldStartY = 100;
-    private final int width = 500;
-    private final int height = 400;
+    private int worldStartX = 50;
+    private int worldStartY = 50;
 
-    private int zoomFactor = 2;
+    private final int width;
+    private final int height;
+
+    private final ViewPort viewPort;
+    private double zoomFactor = 1;
 
 
     public WorldDraw(World world) {
         this.world = world;
+        this.width = world.getWidth();
+        this.height = world.getHeight();
+        this.viewPort = new ViewPort(0, width, 0, height);
     }
 
     @Override
@@ -33,24 +38,29 @@ public class WorldDraw extends JComponent {
         g.drawRect(worldStartX, worldStartY, width, height);
         g.setColor(prev);
 
-        int viewPortX = 0;
-        int viewPortY = 0;
-
         Cell[][] cells = world.getCells();
-        for(int x = viewPortX; x < width / zoomFactor; x++){
-            for(int y = viewPortY; y < height / zoomFactor; y++){
+        for(int x = viewPort.getStartX(); x < viewPort.getEndX(); x++){
+            for(int y = viewPort.getStartY(); y < viewPort.getEndY(); y++){
                 if(cells[x][y].isAlive()){
-                    g.fillRect(x*zoomFactor + worldStartX,y*zoomFactor + worldStartY,1*zoomFactor,1*zoomFactor);
+                    int xOnGUI = (int) (x * zoomFactor) + worldStartX;
+                    int yOnGUI = (int) (y * zoomFactor) + worldStartY;
+                    g.fillRect(xOnGUI,yOnGUI,(int) zoomFactor,(int) zoomFactor);
                 }
             }
         }
     }
 
-    public void setZoomFactor(int zoomFactor) {
-        this.zoomFactor = zoomFactor;
+    public ViewPort getViewPort() {
+        return viewPort;
     }
 
-    public int getZoomFactor() {
+    public void setZoomFactor(double zoomFactor) {
+        this.zoomFactor = zoomFactor;
+        viewPort.setEndX(((int) (width/zoomFactor)) - 1);
+        viewPort.setEndY((int) (height/zoomFactor) - 1);
+    }
+
+    public double getZoomFactor() {
         return zoomFactor;
     }
 }
