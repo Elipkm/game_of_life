@@ -39,6 +39,16 @@ public class World {
         this.onChange();
     }
 
+    public void setCellsRandomlyAlive(int n, int xStart, int xEnd, int yStart, int yEnd){
+        for(int i = 0; i < n; i++){
+            int x = Utils.getRandomNumberInRange(xStart, xEnd-1);
+            int y = Utils.getRandomNumberInRange(yStart, yEnd-1);
+
+            this.cells[x][y].setAlive(true);
+        }
+        this.onChange();
+    }
+
     public void ensureLawsOnWorldChange(){
         Laws laws = new Laws();
         List<Cell> setToDead = new ArrayList<>();
@@ -118,7 +128,16 @@ public class World {
         onChange = runnable;
     }
     private void onChange(){
-        this.onChange.run();
+        if(this.onChange != null){
+            this.onChange.run();
+        }
     }
 
+    @Override
+    public String toString() {
+        return "World{" +
+                "WIDTH=" + WIDTH +
+                ", HEIGHT=" + HEIGHT +
+                '}';
+    }
 }

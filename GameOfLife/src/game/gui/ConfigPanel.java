@@ -11,6 +11,9 @@ public class ConfigPanel extends JPanel {
     private final World world;
     private final WorldDraw worldDrawer;
 
+    private final static int INITIAL_LIFE_DELAY = 100;
+    private final static int NUMBER_OF_CELLS_GET_LIFE = 10;
+
     public ConfigPanel(World world, WorldDraw worldDraw){
         this.world = world;
         this.worldDrawer = worldDraw;
@@ -35,7 +38,7 @@ public class ConfigPanel extends JPanel {
         int createLifeTimeUnit = 300;
         Timer createLifeTime = new Timer(createLifeTimeUnit, e -> {
             ViewPort viewPort = worldDrawer.getViewPort();
-            world.setOneCellRandomlyAlive(viewPort.getStartX(), viewPort.getEndX(), viewPort.getStartY(), viewPort.getEndY());
+            world.setCellsRandomlyAlive(NUMBER_OF_CELLS_GET_LIFE, viewPort.getStartX(), viewPort.getEndX(), viewPort.getStartY(), viewPort.getEndY());
             this.repaint();
         });
         createCellsButton.addActionListener(e -> {
@@ -102,8 +105,7 @@ public class ConfigPanel extends JPanel {
         zoomFactorInput.addActionListener(e -> {
             String input = zoomFactorInput.getText();
             double size = Double.parseDouble(input);
-            worldDrawer.setZoomFactor(size);
-            this.repaint();
+            worldDrawer.setZoomFactor((int) size);
         });
         this.add(zoomFactorInput);
     }

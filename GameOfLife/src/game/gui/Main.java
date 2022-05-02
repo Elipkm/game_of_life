@@ -4,8 +4,12 @@ import game.pojo.World;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.lang.reflect.InvocationTargetException;
 
+
+// TODO: the zooming behaviour is not right after setting a different viewport on the map
 public class Main {
 
     public static void main(String[] args) throws InterruptedException, InvocationTargetException {
@@ -13,15 +17,16 @@ public class Main {
             Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
             int width = (int) screenSize.getWidth();
             int height = (int) screenSize.getHeight();
-            World world = new World(width-100, height-200);
+            World world = new World(600, 400);
             WorldDraw worldDraw = new WorldDraw(world);
             JFrame mainFrame = new MainFrame(world, worldDraw);
-            JFrame configFrame = new ConfigFrame(world, worldDraw);
 
             world.setOnChange(() -> {
                 mainFrame.repaint();
             });
-
+            worldDraw.setOnChange(() -> {
+                mainFrame.repaint();
+            });
         });
     }
 }

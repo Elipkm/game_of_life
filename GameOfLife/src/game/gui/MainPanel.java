@@ -1,10 +1,10 @@
 package game.gui;
 
+import game.pojo.ViewPort;
 import game.pojo.World;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
+import java.awt.event.*;
 
 public class MainPanel extends JPanel {
 
@@ -22,8 +22,7 @@ public class MainPanel extends JPanel {
         this.addMouseWheelListener(new MouseWheelListener() {
             @Override
             public void mouseWheelMoved(MouseWheelEvent e) {
-                System.out.println(e.getWheelRotation());
-                double adjustPerScroll = 0.1;
+                int adjustPerScroll = 1;
                 if(e.getWheelRotation() > 0){
                     worldDraw.setZoomFactor(worldDraw.getZoomFactor() + adjustPerScroll);
                     repaint();
@@ -34,12 +33,60 @@ public class MainPanel extends JPanel {
                 }
             }
         });
+
+
+        Point prevMouse = new Point(-1,-1);
+        this.addMouseMotionListener(new MouseMotionListener() {
+            @Override
+            public void mouseDragged(MouseEvent e) {
+                if(SwingUtilities.isRightMouseButton(e)){
+
+                    int xDiff = prevMouse.x - e.getX();
+                    int yDiff = prevMouse.y - e.getY();
+                    prevMouse.x = e.getX();
+                    prevMouse.y = e.getY();
+
+                    xDiff /= worldDraw.getZoomFactor();
+                    yDiff /= worldDraw.getZoomFactor();
+
+                    // update viewport
+                    ViewPort viewPort = worldDraw.getViewPort();
+                    int newStartX = viewPort.getStartX() + xDiff;
+                    int newEndX = viewPort.getEndX() + xDiff;
+
+                    // add world bounds
+                    if(newStartX >= 0 && newEndX <= world.getWidth()){
+                        viewPort.setStartX(newStartX);
+                        viewPort.setEndX(newEndX);
+                    }
+
+                    int newStartY = viewPort.getStartY() + yDiff;
+                    int newEndY = viewPort.getEndY() + yDiff;
+                    if(newStartY >= 0 && newEndY <= world.getHeight()){
+                        viewPort.setStartY(newStartY);
+                        viewPort.setEndY(newEndY);
+                    }
+
+                    System.out.println("ViewPort change");
+                    System.out.println(viewPort);
+                    System.out.println();
+                    repaint();
+                }
+            }
+
+            @Override
+            public void mouseMoved(MouseEvent e) {
+                prevMouse.x = e.getX();
+                prevMouse.y = e.getY();
+            }
+        });
     }
 
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         worldDraw.paintComponent(g);
+
     }
 
 
